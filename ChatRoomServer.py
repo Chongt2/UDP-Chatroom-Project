@@ -16,15 +16,20 @@ while True:
         ipArray.append(clientAddress)
         userName, clientAddress = serverSocket.recvfrom(2048)
         decodedUserName = userName.decode()
-        welcomeMessage = "Welcome to the chat room " + decodedUserName 
+        welcomeMessage = "Welcome to the chat room " + decodedUserName + "!"
         userArray.append(decodedUserName)
         if len(userArray) == 1:
             serverSocket.sendto(welcomeMessage.encode(), clientAddress)
         else:
             for x in range(0, len(userArray)):
-                if clientAddress != ipArray[x]:
-                    print("send to " + userArray[x])
-                    serverSocket.sendto(welcomeMessage.encode(), ipArray[x])
+                print("send to " + userArray[x])
+                serverSocket.sendto(welcomeMessage.encode(), ipArray[x])
+    elif decodedMessage == "Quit":
+        for x in range(0, len(userArray)):
+            if clientAddress == ipArray[x]:
+                goodbyeMessage = userArray[x] + "has left the chat room."
+                for y in range(0, len(userArray)):
+                    serverSocket.sendto(goodbyeMessage.encode(), ipArray[y])
     else:
         for x in range(0, len(userArray)):
             if clientAddress == ipArray[x]:
