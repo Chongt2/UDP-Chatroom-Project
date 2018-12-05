@@ -35,8 +35,8 @@ def clientQuit(clientAddress):
         
 def clientSend(clientAddress):
     for x in range(0, len(activeUserArray)):
-            if clientAddress == activeIpArray[x]:
-                modifiedMessage = activeUserArray[x] + ": " + decodedMessage
+        if clientAddress == activeIpArray[x]:
+            modifiedMessage = activeUserArray[x] + ": " + decodedMessage
     print("Received: " + modifiedMessage)
     if len(activeUserArray) == 1:
             serverSocket.sendto("There is no one else in this chatroom".encode(), clientAddress)
@@ -45,10 +45,11 @@ def clientSend(clientAddress):
         for x in range(0, len(activeIpArray)):
             if(activeIpArray[x]!=clientAddress):
                 serverSocket.sendto(modifiedMessage.encode(), activeIpArray[x])
-                if(x<len(activeIpArray)-1):
-                    print(activeUserArray[x], end =", ")
-                else:
-                    print(activeUserArray[x])
+#                 if(x==len(activeIpArray)-1):
+                print(activeUserArray[x], end =", ")
+#                 else:
+            else:
+                print(activeUserArray[x])
         
     
 print("The server is ready to receive.")
@@ -58,14 +59,14 @@ while True:
     decodedMessage = message.decode()
     
 #   if message cotains join add user to the active user list
-    if (decodedMessage.lower().find("join") >= 0 and (clientAddress not in activeIpArray)):
+    if (decodedMessage.lower().find("join") >= 0 and decodedMessage.lower().find(" ")==-1):
         print("Join")
         clientJoin(clientAddress)
         print(activeIpArray)
         print(activeUserArray)
         
 #   if message is quit delete client from the active user array, delete client from the username array      
-    elif decodedMessage.lower().find("quit") >= 0:
+    elif (decodedMessage.lower().find("quit") >= 0 and decodedMessage.lower().find(" ")==-1):
         print("Quit")
         clientQuit(clientAddress)
         if(len(activeUserArray)>0):

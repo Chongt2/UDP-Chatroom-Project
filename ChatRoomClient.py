@@ -35,10 +35,12 @@ if message.lower().find("join") >= 0:
     #e.g.: If Chris sent "HI", Jon would see "Jon: Chris: HI
     #message = input(userName + ": ")
     message = input()
-    while message.lower().find('quit') < 0: 
+    
+    while (message.lower().find("quit") > -1 and (message.lower().find(" ") > message.lower().find("quit") or message.lower().find(" ") < message.lower().find("quit"))):
         clientSocket.sendto(message.encode(), (serverName, serverPort))
         message = input()
-
+        
     clientSocket.sendto(message.encode(), (serverName, serverPort))
+    print("pls leave")
     if not t1.isAlive():
         clientSocket.close()
