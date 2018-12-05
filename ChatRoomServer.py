@@ -21,17 +21,18 @@ def addClient(clientAddress):
             serverSocket.sendto(welcomeMessage.encode(), activeIpArray[x])
                 
                 
-def removeClient(clientAddress):
-    
+def removeClient(clientAddress):  
+#     form goodbye message  
     for x in range(0, len(activeIpArray)):
         if(activeIpArray[x]==clientAddress):
-            activeUserArray[x]
+            goodbyeMessage = activeUserArray[x] + " has left the chat room."
             del activeUserArray[x]
             break
-    
+#     remove clientAddress from active users
     activeIpArray.remove(clientAddress)
+#     send goodbye message to all active users
     for x in range(0, len(activeIpArray)):
-        print(" has left the chat room")
+        serverSocket.sendto(goodbyeMessage.encode(), activeIpArray[x])
         
             
     
@@ -45,19 +46,13 @@ while True:
 #   if message is join, add a new client to the active user array, register the username into the activeUserArray
     if decodedMessage.lower().find("join") >= 0:
         addClient(clientAddress)
+        print("Join")
         
 #   if message is quit delete client from the active user array, delete client from the username array      
     elif decodedMessage.lower().find("quit") >= 0:
         removeClient(clientAddress)
         print("Quit")
-        for x in range(0, len(activeIpArray)):
-            if activeIpArray[x] == clientAddress:
-                activeIpArray.remove(clientAddress)
-        for x in range(0, len(activeUserArray)):
-            if clientAddress == activeIpArray[x]:
-                goodbyeMessage = activeUserArray[x] + "has left the chat room."
-                for y in range(0, len(activeUserArray)):
-                    serverSocket.sendto(goodbyeMessage.encode(), activeIpArray[y])
+        
 #   if message does not have join or quit, send the message every other client
     else:
         print("Normal")
