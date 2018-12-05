@@ -6,18 +6,20 @@ import time
 def listener():
     #May need to set a parameter to  so that when the user wants to quit the thread can know when to send
     #a goodbye message
-    while  message.lower().find('quit') < 0:
+    while  message.lower().find("!quit") < 0:
         modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
-        print(modifiedMessage.decode())
+        if(message.lower().find("!quit") < 0):
+            print(modifiedMessage.decode())
         time.sleep(0.300)
-
+    
+    clientSocket.close()
 # def sender():
 #     while True:
         
 serverName = 'localhost'
 serverPort = 5000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
-message = input("Type \"Join\" to join the chat room: ")
+message = input("Type !\"Join\" to join the chat room: ")
 if message.lower().find("join") >= 0:
     clientSocket.sendto(message.encode(), (serverName, serverPort))
     userName = input("What is your user name? ")
@@ -36,11 +38,9 @@ if message.lower().find("join") >= 0:
     #message = input(userName + ": ")
     message = input()
     
-    while (message.lower().find("quit") > -1 and (message.lower().find(" ") > message.lower().find("quit") or message.lower().find(" ") < message.lower().find("quit"))):
+    while (message.lower().find("!quit") == -1):
         clientSocket.sendto(message.encode(), (serverName, serverPort))
         message = input()
         
     clientSocket.sendto(message.encode(), (serverName, serverPort))
-    print("pls leave")
-    if not t1.isAlive():
-        clientSocket.close()
+    print("Disconnected from chatroom")

@@ -27,6 +27,7 @@ def clientQuit(clientAddress):
             goodbyeMessage = activeUserArray[x] + " has left the chat room."
             del activeUserArray[x]
             break
+    serverSocket.sendto("!quit".encode(), clientAddress)
 #     remove clientAddress from active users
     activeIpArray.remove(clientAddress)
 #     send goodbye message to all active users
@@ -59,14 +60,14 @@ while True:
     decodedMessage = message.decode()
     
 #   if message cotains join add user to the active user list
-    if (decodedMessage.lower().find("join") >= 0 and decodedMessage.lower().find(" ")==-1):
+    if (decodedMessage.lower().find("!join") > -1):
         print("Join")
         clientJoin(clientAddress)
         print(activeIpArray)
         print(activeUserArray)
         
 #   if message is quit delete client from the active user array, delete client from the username array      
-    elif (decodedMessage.lower().find("quit") >= 0 and decodedMessage.lower().find(" ")==-1):
+    elif (decodedMessage.lower().find("!quit") > -1):
         print("Quit")
         clientQuit(clientAddress)
         if(len(activeUserArray)>0):
