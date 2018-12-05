@@ -46,7 +46,7 @@ def clientSend(clientAddress):
             if(activeIpArray[x]!=clientAddress):
                 serverSocket.sendto(modifiedMessage.encode(), activeIpArray[x])
                 if(x<len(activeIpArray)-1):
-                    print(activeUserArray[x], end ="")
+                    print(activeUserArray[x], end =", ")
                 else:
                     print(activeUserArray[x])
         
@@ -55,13 +55,13 @@ print("The server is ready to receive.")
 while True:
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     message, clientAddress = serverSocket.recvfrom(2048)
-    print(clientAddress)
     decodedMessage = message.decode()
     
 #   if message cotains join add user to the active user list
     if (decodedMessage.lower().find("join") >= 0 and (clientAddress not in activeIpArray)):
         print("Join")
         clientJoin(clientAddress)
+        print(activeIpArray)
         print(activeUserArray)
         
 #   if message is quit delete client from the active user array, delete client from the username array      
@@ -69,6 +69,7 @@ while True:
         print("Quit")
         clientQuit(clientAddress)
         if(len(activeUserArray)>0):
+            print(activeIpArray)
             print(activeUserArray)
         else:
             print("No active users")
@@ -77,5 +78,6 @@ while True:
     else:
         print("Normal")
         clientSend(clientAddress)
+        print(activeIpArray)
         print(activeUserArray)       
         
