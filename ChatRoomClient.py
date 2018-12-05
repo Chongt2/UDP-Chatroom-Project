@@ -6,7 +6,7 @@ import time
 def listener():
     #May need to set a parameter to  so that when the user wants to quit the thread can know when to send
     #a goodbye message
-    while True:
+    while  message.lower().find('quit') < 0:
         modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
         print(modifiedMessage.decode())
         time.sleep(0.300)
@@ -30,6 +30,7 @@ if message.lower().find("join") >= 0:
     #After client joins the listener thread runs immediately.
     t1 = threading.Thread(target=listener)
     t1.start()
+    
     #Without formatting the incoming message is received after the receiving clients user name
     #e.g.: If Chris sent "HI", Jon would see "Jon: Chris: HI
     #message = input(userName + ": ")
