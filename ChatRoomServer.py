@@ -4,43 +4,72 @@ import datetime
 serverPort = 5000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(('', serverPort))
-ipArray=[]
-userArray=[]
+activeIpArray = []
+activeUserArray = []
+
+def addClient(clientAddress):
+    activeIpArray.append(clientAddress)
+    userName, clientAddress = serverSocket.recvfrom(2048)
+    decodedUserName = userName.decode()
+    welcomeMessage = "Welcome to the chat room " + decodedUserName + "!"
+    activeUserArray.append(decodedUserName)
+    if len(activeUserArray) == 1:
+        serverSocket.sendto(welcomeMessage.encode(), clientAddress)
+    else:
+        for x in range(0, len(activeUserArray)):
+            print("send to " + activeUserArray[x])
+            serverSocket.sendto(welcomeMessage.encode(), activeIpArray[x])
+                
+                
+def removeClient(clientAddress):
+    
+    for x in range(0, len(activeIpArray)):
+        if(activeIpArray[x]==clientAddress):
+            activeUserArray[x]
+            del activeUserArray[x]
+            break
+    
+    activeIpArray.remove(clientAddress)
+    for x in range(0, len(activeIpArray)):
+        print(" has left the chat room")
+        
+            
+    
 print("The server is ready to receive.")
 while True:
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     message, clientAddress = serverSocket.recvfrom(2048)
     print(clientAddress)
     decodedMessage = message.decode()
-    if decodedMessage == "Join":
-        ipArray.append(clientAddress)
-        userName, clientAddress = serverSocket.recvfrom(2048)
-        decodedUserName = userName.decode()
-        welcomeMessage = "Welcome to the chat room " + decodedUserName + "!"
-        userArray.append(decodedUserName)
-        if len(userArray) == 1:
-            serverSocket.sendto(welcomeMessage.encode(), clientAddress)
-        else:
-            for x in range(0, len(userArray)):
-                print("send to " + userArray[x])
-                serverSocket.sendto(welcomeMessage.encode(), ipArray[x])
-    elif decodedMessage == "Quit":
-        for x in range(0, len(userArray)):
-            if clientAddress == ipArray[x]:
-                goodbyeMessage = userArray[x] + "has left the chat room."
-                for y in range(0, len(userArray)):
-                    serverSocket.sendto(goodbyeMessage.encode(), ipArray[y])
+    
+#   if message is join, add a new client to the active user array, register the username into the activeUserArray
+    if decodedMessage.lower().find("join") >= 0:
+        addClient(clientAddress)
+        
+#   if message is quit delete client from the active user array, delete client from the username array      
+    elif decodedMessage.lower().find("quit") >= 0:
+        removeClient(clientAddress)
+        print("Quit")
+        for x in range(0, len(activeIpArray)):
+            if activeIpArray[x] == clientAddress:
+                activeIpArray.remove(clientAddress)
+        for x in range(0, len(activeUserArray)):
+            if clientAddress == activeIpArray[x]:
+                goodbyeMessage = activeUserArray[x] + "has left the chat room."
+                for y in range(0, len(activeUserArray)):
+                    serverSocket.sendto(goodbyeMessage.encode(), activeIpArray[y])
+#   if message does not have join or quit, send the message every other client
     else:
-        for x in range(0, len(userArray)):
-            if clientAddress == ipArray[x]:
-                modifiedMessage = userArray[x] + ": " + decodedMessage
-#         modifiedMessage = time + " " + decodedMessage
+        print("Normal")
+        for x in range(0, len(activeUserArray)):
+            if clientAddress == activeIpArray[x]:
+                modifiedMessage = activeUserArray[x] + ": " + decodedMessage
         print("message to be sent back: ")
-        print(modifiedMessage)
-        if len(userArray) == 1:
+        print(decodedMessage)
+        if len(activeUserArray) == 1:
             serverSocket.sendto(modifiedMessage.encode(), clientAddress)
         else:
-            for x in range(0, len(userArray)):
-                if clientAddress != ipArray[x]:
-                    print("send to " + userArray[x])
-                    serverSocket.sendto(modifiedMessage.encode(), ipArray[x])
+            for x in range(0, len(activeUserArray)):
+                if clientAddress != activeIpArray[x]:
+                    print("send to " + activeUserArray[x])
+                    serverSocket.sendto(modifiedMessage.encode(), activeIpArray[x])
