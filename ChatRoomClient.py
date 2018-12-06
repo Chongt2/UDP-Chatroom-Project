@@ -41,6 +41,7 @@ if message.lower().find("join") >= 0:
     while (message.lower().find("!quit") == -1):
         clientSocket.sendto(message.encode(), (serverName, serverPort))
         message = input()
+            
         
     clientSocket.sendto(message.encode(), (serverName, serverPort))
     print("Disconnected from chatroom")
