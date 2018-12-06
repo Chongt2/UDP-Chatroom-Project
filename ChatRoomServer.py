@@ -4,74 +4,74 @@ import datetime
 serverPort = 5000
 serverSocket = socket(AF_INET, SOCK_DGRAM)
 serverSocket.bind(('', serverPort))
-activeIpList = []
-activeUserList = []
-clientMuteList = []
+activeClientsList = []
 
 class Client:
-    blockList = []
-    muteStatus = False
-    def _init_(self, clientAddress, userName):
+    def __init__(self, clientAddress, userName):
         self.clientAddress = clientAddress
         self.userName = userName
+        self.blockList = []
+        self.muteStatus = False
 
 def clientJoin(clientAddress):
-    activeIpList.append(clientAddress)
-    clientMuteList.append(False)
     userName, clientAddress = serverSocket.recvfrom(2048)
     decodedUserName = userName.decode()
+#     welcomeMessage = "Welcome to the chat room " + decodedUserName + "!: ".join((str(x) for x in clientAddress))
     welcomeMessage = "Welcome to the chat room " + decodedUserName + "!: "
-    print(clientAddress)
-    activeUserList.append(decodedUserName)
-    if len(activeUserList) == 1:
+    activeClientsList.append(Client(clientAddress, decodedUserName))
+    if len(activeClientsList) == 1:
         serverSocket.sendto(welcomeMessage.encode(), clientAddress)
     else:
-        for x in range(0, len(activeUserList)):
-            print("send to " + activeUserList[x])
-            serverSocket.sendto(welcomeMessage.encode(), activeIpList[x])
+        print("send to ")
+        for clients in activeClientsList:
+            print(clients.userName, end=" ")
+            serverSocket.sendto(welcomeMessage.encode(), clients.clientAddress)
+        print()
                 
 def clientQuit(clientAddress):  
-    for x in range(0, len(activeIpList)):
-        if(activeIpList[x]==clientAddress):
-            goodbyeMessage = activeUserList[x] + " has left the chat room.: " + clientAddress
-            clientMuteList.pop(x)
-            del activeUserList[x]
+    for clients in activeClientsList:
+        goodbyeMessage = clients.userName + " has left the chat room.: "
+        if(clients.clientAddress==clientAddress):
+            activeClientsList.remove(clients)
             break
+        
     serverSocket.sendto("!quit".encode(), clientAddress)
 #     remove clientAddress from active users
-    activeIpList.remove(clientAddress)
 #     send goodbye message to all active users
-    for x in range(0, len(activeIpList)):
-        serverSocket.sendto(goodbyeMessage.encode(), activeIpList[x])
+    for clients in activeClientsList:
+        serverSocket.sendto(goodbyeMessage.encode(), clients.clientAddress)
         
 def clientSend(clientAddress):
-    for x in range(0, len(activeUserList)):
-        if clientAddress == activeIpList[x]:
-            modifiedMessage = activeUserList[x] + ": " + decodedMessage
+    for clients in activeClientsList:
+        if(clients.clientAddress==clientAddress):
+            modifiedMessage = clients.userName + ": " + decodedMessage
     print("Received: " + modifiedMessage)
-    if len(activeUserList) == 1:
+    if len(activeClientsList) == 1:
             serverSocket.sendto("There is no one else in this chat room".encode(), clientAddress)
     else:
         print("Send to: ", end = "")
-        for x in range(0, len(activeIpList)):
-            print(clientMuteList)
-            if(activeIpList[x]!=clientAddress and not clientMuteList[x]):
-                serverSocket.sendto(modifiedMessage.encode(), activeIpList[x])
-#                 if(x==len(activeIpList)-1):
-                print(activeUserList[x], end =", ")
-#                 else:
-            else:
-                print(activeUserList[x])
+        for clients in activeClientsList:
+#                 print(clients.muteStatus)    
+            if(clients.clientAddress!=clientAddress and not clients.muteStatus):
+                serverSocket.sendto(modifiedMessage.encode(), clients.clientAddress)
+                print(clients.userName, end =" ")
+        print()
         
 def clientMute(clientAddress):
-    for x in range(0, len(activeIpList)):
-        if(activeIpList[x] == clientAddress):
-            clientMuteList[x] = True
+    for clients in activeClientsList:
+        if(clients.clientAddress == clientAddress):
+            clients.muteStatus = True
     
 def clientUnmute(clientAddress):
-    for x in range(0, len(activeIpList)):
-        if(activeIpList[x] == clientAddress):
-            clientMuteList[x] = False
+    for clients in activeClientsList:
+        if(clients.clientAddress == clientAddress):
+            clients.muteStatus = False
+                
+def clientBlock(clientAddress):
+    for clients in activeClientsList:
+        if(clients.clientAddress == clientAddress):
+#             clients.blockList = 
+            print("nonsense")
     
 print("The server is ready to receive.")
 while True:
@@ -80,41 +80,72 @@ while True:
     decodedMessage = message.decode()
     
 #   if message cotains join add user to the active user list
-    if (decodedMessage.lower().find("!join") > -1):
+    if (decodedMessage.lower() == "!join"):
         print("Join")
         clientJoin(clientAddress)
-        print(activeIpList)
-        print(activeUserList)
+        print("Active users: ")
+        for clients in activeClientsList:
+            print("{", end="")
+            print(clients.clientAddress, end=", ")
+            print(clients.userName, end=", ")
+            print(clients.muteStatus, end="}")
+            print()
         
 #   if message is quit delete client from the active user List, delete client from the username List      
-    elif (decodedMessage.lower().find("!quit") > -1):
+    elif (decodedMessage.lower() == "!quit"):
         print("Quit")
         clientQuit(clientAddress)
-        if(len(activeUserList)>0):
-            print(activeIpList)
-            print(activeUserList)
+        if(len(activeClientsList)>0):
+            print("Active users: ")
+            for clients in activeClientsList:
+                print("{", end="")
+                print(clients.clientAddress, end=", ")
+                print(clients.userName, end=", ")
+                print(clients.muteStatus, end="}")
+                print()
         else:
             print("No active users")
         
-    elif (decodedMessage.lower().find("!mute") > -1 ):
+    elif (decodedMessage.lower() == "!mute"):
         clientMute(clientAddress)
         print("Mute")
-        print(activeIpList)
-        print(activeUserList)  
-        print(clientMuteList)     
+        print("Active users: ")
+        for clients in activeClientsList:
+            print("{", end="")
+            print(clients.clientAddress, end=", ")
+            print(clients.userName, end=", ")
+            print(clients.muteStatus, end="}")
+            print()
         
-        
-    elif (decodedMessage.lower().find("!unmute") > -1):
+    elif (decodedMessage.lower() == "!unmute"):
         clientUnmute(clientAddress)
         print("Unmute")
-        print(activeIpList)
-        print(activeUserList)       
-        print(clientMuteList)
+        print("Active users: ")
+        for clients in activeClientsList:
+            print("{", end="")
+            print(clients.clientAddress, end=", ")
+            print(clients.userName, end=", ")
+            print(clients.muteStatus, end="}")
+            print()
+    
+    elif (decodedMessage.lower().find("!block") == 0):
+        clientBlock(clientAddress)
+        print("Active users: ")
+        for clients in activeClientsList:
+            print("{", end="")
+            print(clients.clientAddress, end=", ")
+            print(clients.userName, end=", ")
+            print(clients.muteStatus, end="}")
+            print()
         
 #   if message does not have join or quit, send the message every other client
     else:
         print("Normal")
         clientSend(clientAddress)
-        print(activeIpList)
-        print(activeUserList)       
-        
+        print("Active users: ")
+        for clients in activeClientsList:
+            print("{", end="")
+            print(clients.clientAddress, end=", ")
+            print(clients.userName, end=", ")
+            print(clients.muteStatus, end="}")
+            print()
