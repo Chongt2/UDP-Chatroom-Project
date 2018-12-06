@@ -13,7 +13,7 @@ class Client:
         self.blockedClientsList = []
         self.muteStatus = False
 
-def clientJoin(clientAddress):
+def clientJoin():
     print("clientJoin called")
     userName, clientAddress = serverSocket.recvfrom(2048)
     decodedUserName = userName.decode()
@@ -135,7 +135,7 @@ while True:
     
 #   Add a new client to the activeClientsList
     if (decodedMessage.lower() == "!join"):
-        clientJoin(clientAddress)
+        clientJoin()
         print("Active users: ")
         for clients in activeClientsList:
             print("{", end="")
