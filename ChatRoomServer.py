@@ -14,6 +14,7 @@ class Client:
         self.muteStatus = False
 
 def clientJoin(clientAddress):
+    print("clientJoin called")
     userName, clientAddress = serverSocket.recvfrom(2048)
     decodedUserName = userName.decode()
 #     welcomeMessage = "Welcome to the chat room " + decodedUserName + "!: ".join((str(x) for x in clientAddress))
@@ -29,6 +30,7 @@ def clientJoin(clientAddress):
         print()
                 
 def clientQuit(clientAddress):  
+    print("clientQuit called")
     for clients in activeClientsList:
         goodbyeMessage = clients.userName + " has left the chat room.: "
         if(clients.clientAddress==clientAddress):
@@ -42,6 +44,7 @@ def clientQuit(clientAddress):
         serverSocket.sendto(goodbyeMessage.encode(), clients.clientAddress)
         
 def clientSend(clientAddress):
+    print("clientSend called")
     for clients in activeClientsList:
         if(clients.clientAddress==clientAddress):
             modifiedMessage = clients.userName + ": " + decodedMessage
@@ -59,7 +62,7 @@ def clientSend(clientAddress):
                 if(not clients.muteStatus):
                     print("This is " + clients.userName + "'s blockList")
                     for blockedClients in range(len(clients.blockedClientsList)):
-    #                     do not send to clients blocking this client's clientAddress
+#                         do not send to clients blocking this client's clientAddress
                         print(type(clientAddress[0]), end=": ")
                         print(clientAddress[0], end=", ")
                         print(type(clientAddress[1]), end=": ")
@@ -82,16 +85,20 @@ def clientSend(clientAddress):
         print()
         
 def clientMute(clientAddress):
+    print("clientMute called")
     for clients in activeClientsList:
         if(clients.clientAddress == clientAddress):
             clients.muteStatus = True
     
+
 def clientUnmute(clientAddress):
+    print("clientUnmute called")
     for clients in activeClientsList:
         if(clients.clientAddress == clientAddress):
             clients.muteStatus = False
                 
 def clientBlock(clientAddress):
+    print("clientBlock called")
     for clients in activeClientsList:
         if(clients.clientAddress == clientAddress):
             blockedIpIndexStart = decodedMessage.find("[") + 1
@@ -100,13 +107,13 @@ def clientBlock(clientAddress):
             blockedPortIndexEnd = decodedMessage.find("]",blockedPortIndexStart)
             blockedIpAddress = decodedMessage[blockedIpIndexStart:blockedIpIndexEnd]
             blockedPortAddress = decodedMessage[blockedPortIndexStart:blockedPortIndexEnd]
-#                 blockedPortNumber = decodedMessage[x+decodedMessage.find("]")+1]
             blockedPortAddress = int(blockedPortAddress)
             blockedClientAddress = (blockedIpAddress, blockedPortAddress)
             clients.blockedClientsList.append(blockedClientAddress)
             print(clients.blockedClientsList)
             
 def clientUnblock(clientAddress):
+    print("clientUnblock called")
     for clients in activeClientsList:
         if(clients.clientAddress == clientAddress):
             blockedIpIndexStart = decodedMessage.find("[") + 1
@@ -115,7 +122,6 @@ def clientUnblock(clientAddress):
             blockedPortIndexEnd = decodedMessage.find("]",blockedPortIndexStart)
             blockedIpAddress = decodedMessage[blockedIpIndexStart:blockedIpIndexEnd]
             blockedPortAddress = decodedMessage[blockedPortIndexStart:blockedPortIndexEnd]
-#                 blockedPortNumber = decodedMessage[x+decodedMessage.find("]")+1]
             blockedPortAddress = int(blockedPortAddress)
             blockedClientAddress = (blockedIpAddress, blockedPortAddress)
             clients.blockedClientsList.remove(blockedClientAddress)
@@ -127,9 +133,8 @@ while True:
     message, clientAddress = serverSocket.recvfrom(2048)
     decodedMessage = message.decode()
     
-#   if message cotains join add user to the active user list
+#   Add a new client to the activeClientsList
     if (decodedMessage.lower() == "!join"):
-        print("Join")
         clientJoin(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
@@ -140,9 +145,8 @@ while True:
             print(clients.blockedClientsList, end="}")
             print()
         
-#   if message is quit delete client from the active user List, delete client from the username List      
+#   remove client from the activeClientsListBased on their clientAddress   
     elif (decodedMessage.lower() == "!quit"):
-        print("Quit")
         clientQuit(clientAddress)
         if(len(activeClientsList)>0):
             print("Active users: ")
@@ -156,9 +160,9 @@ while True:
         else:
             print("No active users")
         
+#     mute chat room
     elif (decodedMessage.lower() == "!mute"):
         clientMute(clientAddress)
-        print("Mute")
         print("Active users: ")
         for clients in activeClientsList:
             print("{", end="")
@@ -168,9 +172,9 @@ while True:
             print(clients.blockedClientsList, end="}")
             print()
         
+#     unmute chat room
     elif (decodedMessage.lower() == "!unmute"):
         clientUnmute(clientAddress)
-        print("Unmute")
         print("Active users: ")
         for clients in activeClientsList:
             print("{", end="")
@@ -180,6 +184,7 @@ while True:
             print(clients.blockedClientsList, end="}")
             print()
     
+#     block a specific user by their client address use !block [ipaddress][portnumber] format
     elif (decodedMessage.lower().find("!block") == 0):
         clientBlock(clientAddress)
         print("Active users: ")
@@ -191,6 +196,7 @@ while True:
             print(clients.blockedClientsList, end="}")
             print()
             
+#     unblock a specific user by their client address use !unblock [ipaddress][portnumber] format
     elif (decodedMessage.lower().find("!unblock") == 0):
         clientUnblock(clientAddress)
         print("Active users: ")
@@ -202,9 +208,8 @@ while True:
             print(clients.blockedClientsList, end="}")
             print()
         
-#   if message does not have join or quit, send the message every other client
+#   if message is tno 
     else:
-        print("Normal")
         clientSend(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
