@@ -44,4 +44,4 @@ if message.lower().find("join") >= 0:
             
         
     clientSocket.sendto(message.encode(), (serverName, serverPort))
-    print("Disconnected from chat room")
+    print("Disconnect successful")

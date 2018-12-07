@@ -18,7 +18,7 @@ def clientJoin():
     userName, clientAddress = serverSocket.recvfrom(2048)
     decodedUserName = userName.decode()
 #     welcomeMessage = "Welcome to the chat room " + decodedUserName + "!: ".join((str(x) for x in clientAddress))
-    welcomeMessage = "Welcome to the chat room " + decodedUserName + "!: "
+    welcomeMessage = "Welcome to the chat room " + decodedUserName + "!: " + str(clientAddress)
     activeClientsList.append(Client(clientAddress, decodedUserName))
     if len(activeClientsList) == 1:
         serverSocket.sendto(welcomeMessage.encode(), clientAddress)
@@ -57,7 +57,7 @@ def clientSend(clientAddress):
             if(len(clients.blockedClientsList) <= 0):
                 if(clients.clientAddress!=clientAddress and not clients.muteStatus):
                     serverSocket.sendto(modifiedMessage.encode(), clients.clientAddress)
-                    print(clients.userName, end =" ")
+                    print(clients.userName)
             else:
                 if(not clients.muteStatus):
                     print("This is " + clients.userName + "'s blockList")
