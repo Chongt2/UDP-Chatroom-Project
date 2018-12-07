@@ -11,14 +11,13 @@ def listener():
         if(message.lower().find("!quit") < 0):
             print(modifiedMessage.decode())
         time.sleep(0.300)
-    
     clientSocket.close()
 
 serverName = 'localhost'
 serverPort = 5000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 message = input("Type \"!Join\" to join the chat room: ")
-if message.lower().find("join") >= 0:
+if (message.lower() == "!join"):
     clientSocket.sendto(message.encode(), (serverName, serverPort))
     userName = input("What is your user name? ")
 
