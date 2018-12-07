@@ -46,7 +46,6 @@ def clientMute():
     for clients in activeClientsList:
         if(clients.clientAddress == clientAddress):
             clients.muteStatus = True
-    
 
 def clientUnmute(clientAddress):
     print("clientUnmute called")
@@ -163,7 +162,7 @@ while True:
             print("No active users")
             print()
         
-#     mute chat room
+#     mute client's feed
     elif (decodedMessage.lower() == "!mute"):
         print(time)
         clientMute()
@@ -177,7 +176,7 @@ while True:
             print()
         print()
         
-#     unmute chat room
+#     unmute client's feed
     elif (decodedMessage.lower() == "!unmute"):
         print(time)
         clientUnmute()
@@ -218,7 +217,8 @@ while True:
             print(clients.blockedClientsList, end="}")
             print()
         print()
-#   if message is tno 
+        
+#   if message is not a command send to other clients 
     else:
         print(time)
         clientSend()
