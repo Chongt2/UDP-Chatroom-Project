@@ -10,8 +10,8 @@ class Client:
     def __init__(self, clientAddress, userName):
         self.clientAddress = clientAddress
         self.userName = userName
-        self.blockedClientsList = []
         self.muteStatus = False
+        self.blockedClientsList = []
 
 def clientJoin():
     print("clientJoin called")
@@ -32,7 +32,7 @@ def clientJoin():
 def clientQuit(clientAddress):  
     print("clientQuit called")
     for clients in activeClientsList:
-        goodbyeMessage = clients.userName + " has left the chat room.: "
+        goodbyeMessage = clients.userName + " has left the chat room."
         if(clients.clientAddress==clientAddress):
             activeClientsList.remove(clients)
             break
@@ -135,6 +135,7 @@ while True:
     
 #   Add a new client to the activeClientsList
     if (decodedMessage.lower() == "!join"):
+        print(time)
         clientJoin()
         print("Active users: ")
         for clients in activeClientsList:
@@ -144,9 +145,11 @@ while True:
             print(clients.muteStatus, end=", ")
             print(clients.blockedClientsList, end="}")
             print()
+        print()
         
 #   remove client from the activeClientsListBased on their clientAddress   
     elif (decodedMessage.lower() == "!quit"):
+        print(time)
         clientQuit(clientAddress)
         if(len(activeClientsList)>0):
             print("Active users: ")
@@ -157,11 +160,14 @@ while True:
                 print(clients.muteStatus, end=", ")
                 print(clients.blockedClientsList, end="}")
                 print()
+                print()
         else:
             print("No active users")
+            print()
         
 #     mute chat room
     elif (decodedMessage.lower() == "!mute"):
+        print(time)
         clientMute(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
@@ -171,9 +177,11 @@ while True:
             print(clients.muteStatus, end=", ")
             print(clients.blockedClientsList, end="}")
             print()
+        print()
         
 #     unmute chat room
     elif (decodedMessage.lower() == "!unmute"):
+        print(time)
         clientUnmute(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
@@ -183,9 +191,11 @@ while True:
             print(clients.muteStatus, end=", ")
             print(clients.blockedClientsList, end="}")
             print()
+        print()
     
 #     block a specific user by their client address use !block [ipaddress][portnumber] format
     elif (decodedMessage.lower().find("!block") == 0):
+        print(time)
         clientBlock(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
@@ -195,9 +205,11 @@ while True:
             print(clients.muteStatus, end=", ")
             print(clients.blockedClientsList, end="}")
             print()
+        print()
             
 #     unblock a specific user by their client address use !unblock [ipaddress][portnumber] format
     elif (decodedMessage.lower().find("!unblock") == 0):
+        print(time)
         clientUnblock(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
@@ -207,9 +219,10 @@ while True:
             print(clients.muteStatus, end=", ")
             print(clients.blockedClientsList, end="}")
             print()
-        
+        print()
 #   if message is tno 
     else:
+        print(time)
         clientSend(clientAddress)
         print("Active users: ")
         for clients in activeClientsList:
@@ -219,3 +232,4 @@ while True:
             print(clients.muteStatus, end=", ")
             print(clients.blockedClientsList, end="}")
             print()
+        print()
