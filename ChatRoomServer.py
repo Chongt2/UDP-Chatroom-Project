@@ -47,7 +47,7 @@ def clientMute():
         if(clients.clientAddress == clientAddress):
             clients.muteStatus = True
 
-def clientUnmute(clientAddress):
+def clientUnmute():
     print("clientUnmute called")
     for clients in activeClientsList:
         if(clients.clientAddress == clientAddress):
@@ -101,6 +101,7 @@ def clientSend():
             else:
                 if(not clients.muteStatus):
                     print("This is " + clients.userName + "'s blockList")
+                    sendMessage = True
                     for blockedClients in range(len(clients.blockedClientsList)):
 #                         do not send to clients blocking this client's clientAddress
                         print(type(clientAddress[0]), end=": ")
@@ -115,11 +116,14 @@ def clientSend():
                         print(clientAddress)
                         print(type(clients.blockedClientsList[blockedClients]), end=": ")
                         print(clients.blockedClientsList[blockedClients])
-                        if(clientAddress != clients.blockedClientsList[blockedClients]):
-                            serverSocket.sendto(modifiedMessage.encode(), clients.clientAddress)
-                            print(clients.userName, end =" ")
-                        else:
-                            for blockedClient in range(len(activeClientsList)):
+                        if(clientAddress == clients.blockedClientsList[blockedClients]):
+                            sendMessage = False
+                            break
+                    if (sendMessage and clients.clientAddress!=clientAddress):
+                        serverSocket.sendto(modifiedMessage.encode(), clients.clientAddress)
+                        print(clients.userName, end =" ")
+                    else:
+                        for blockedClient in range(len(activeClientsList)):
                                 if(activeClientsList[blockedClient].clientAddress == clients.blockedClientsList[blockedClients]):
                                     print(clients.userName + " is blocking " + activeClientsList[blockedClient].userName)
         print()
